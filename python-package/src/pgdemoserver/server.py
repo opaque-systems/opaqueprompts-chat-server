@@ -14,7 +14,7 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    anonymized_prompt: str
+    sanitized_prompt: str
     plaintext_response: str
     updated_chat_history: str
 
@@ -27,7 +27,7 @@ async def chat(
     # TODO(ENG-1759): Implement
 
     return ChatResponse(
-        anonymized_prompt="TODO",
+        sanitized_prompt="TODO",
         plaintext_response="TODO",
         updated_chat_history="TODO",
     )
