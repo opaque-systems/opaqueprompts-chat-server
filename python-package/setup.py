@@ -16,4 +16,3 @@ setup(
     long_description=README_FILE_PATH.read_text(),
     setup_requires=requirements,
 )
-
