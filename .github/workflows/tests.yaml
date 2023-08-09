@@ -61,14 +61,16 @@ jobs:
           # Build package
           pip install python-package/
 
+      # Uncomment this step when we add other unit tests
+      #
       # Run all tests exception authorization tests.
       # Authorization tests require hiting an auth0 endpoint that has a rate
       # limit of 1000 requests per month.
-      - name: Run tests (except authorization)
-        shell: bash
-        run: |
-            cd python-package/tests/
-            python -m pytest --ignore unit/test_authorization.py
+      # - name: Run tests (except authorization)
+      #   shell: bash
+      #   run: |
+      #       cd python-package/tests/
+      #       python -m pytest --ignore unit/test_authorization.py
 
       - name: Run authorization tests
         shell: bash
