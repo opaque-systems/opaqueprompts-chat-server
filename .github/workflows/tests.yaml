@@ -55,6 +55,9 @@ jobs:
           # Install requirements
           pip install -r python-package/requirements.txt
 
+          # Install test requirements
+          pip install -r python-package/tests/requirements.txt
+
           # Build package
           pip install python-package/
 
