@@ -151,7 +151,7 @@ def test_verify_invalid_domain(auth0_access_token: str) -> None:
     """
     ########## ARRANGE ##########
     token_verifier = VerifyToken(auth0_access_token)
-    token_verifier.domain = "diferent-domain.us.auth0.com"
+    token_verifier.domain = "different-domain.us.auth0.com"
 
     ########## ACT & ASSERT ##########
     with pytest.raises(HTTPException):
