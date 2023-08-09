@@ -53,16 +53,6 @@ class VerifyToken:
             self.signing_key = self.jwks_client.get_signing_key_from_jwt(
                 self.token
             ).key
-        except jwt.exceptions.PyJWKClientError as error:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED, detail=str(error)
-            )
-        except jwt.exceptions.DecodeError as error:
-            raise HTTPException(
-                status_code=HTTPStatus.UNAUTHORIZED, detail=str(error)
-            )
-
-        try:
             payload = jwt.decode(
                 self.token,
                 self.signing_key,
@@ -71,7 +61,7 @@ class VerifyToken:
                 issuer=f"https://{self.domain}/",
             )
         except Exception as error:
-            return HTTPException(
+            raise HTTPException(
                 status_code=HTTPStatus.UNAUTHORIZED, detail=str(error)
             )
 
