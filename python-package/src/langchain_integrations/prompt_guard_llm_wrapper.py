@@ -15,12 +15,9 @@ class PromptGuardLLMWrapper(LLM):
     A LLM that uses the PromptGuard library to sanitize and desanitize.
 
 
-    To use, you should have the ``promptguard`` python package installed,
-    and the environment variable ``PROMPT_GUARD_ACCESS_TOKEN`` set with
+    To use, you should have the `promptguard` python package installed,
+    and the environment variable `PROMPT_GUARD_ACCESS_TOKEN` set with
     your access token, or pass it as a named parameter to the constructor.
-    To use Prediction Guard's API along with OpenAI models, set the
-    environment variable ``OPENAI_API_KEY``
-    with your OpenAI API key as well.
 
     Example:
         .. code-block:: python
@@ -40,7 +37,9 @@ class PromptGuardLLMWrapper(LLM):
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that the access token and python package exists
         in environment."""
-        token = get_from_dict_or_env(values, "PROMPT_GUARD_ACCESS_TOKEN")
+        token = get_from_dict_or_env(
+            values, "prompt_guard_access_token", "PROMPT_GUARD_ACCESS_TOKEN"
+        )
         if token is None:
             raise ValueError(
                 "Could not find PROMPT_GUARD_ACCESS_TOKEN in environment. "
@@ -85,7 +84,7 @@ class PromptGuardLLMWrapper(LLM):
         sanitized_prompt_value_str = sanitize_response.sanitized_text
         if self.verbose:
             print("Original prompt from user", prompt)
-            print("sanitizedd prompt to LLM", sanitized_prompt_value_str)
+            print("sanitized prompt to LLM", sanitized_prompt_value_str)
         llm_response = self.llm.generate_prompt(
             [StringPromptValue(text=sanitized_prompt_value_str)],
         )
