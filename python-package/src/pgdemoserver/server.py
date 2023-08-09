@@ -1,11 +1,16 @@
 # main.py
 
-from typing import Annotated
+from typing import Any
 
-from fastapi import FastAPI, Header
+from fastapi import Depends, FastAPI
+from fastapi.security import HTTPBearer
+from pgdemoserver.authorization import VerifyToken
 from pydantic import BaseModel
 
+# from pgdemoserver.authorization import token_validator
+
 app = FastAPI()
+token_auth_scheme = HTTPBearer()
 
 
 class ChatRequest(BaseModel):
@@ -22,8 +27,12 @@ class ChatResponse(BaseModel):
 @app.post("/chat/")
 async def chat(
     chat_request: ChatRequest,
-    bearer_token: Annotated[str | None, Header()] = None,
+    bearer_token: Any = Depends(token_auth_scheme),
 ) -> ChatResponse:
+    # Verify bearer_token
+    VerifyToken(bearer_token.credentials).verify(
+        required_scopes=["use:opaque-ppp-chat-bot"]
+    )
     # TODO(ENG-1759): Implement
 
     return ChatResponse(
