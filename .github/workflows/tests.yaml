@@ -73,6 +73,7 @@ jobs:
       #       python -m pytest --ignore unit/test_authorization.py
 
       - name: Run authorization tests
+        if: ${{ github.event_name == 'push' }}
         shell: bash
         env:
           PROMPT_GUARD_TEST_SECRET: '${{ secrets.AUTH0_PROMPT_GUARD_TEST_SECRET }}'
