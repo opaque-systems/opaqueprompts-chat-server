@@ -56,7 +56,7 @@ Answer:
 prompt = ChatPromptTemplate.from_template(template)
 llm = EchoLLM()
 
-chain = (
+pg_chain = (
     pgf.sanitize
     | RunnableMap(
         {
@@ -70,7 +70,7 @@ chain = (
     | (lambda x: pgf.desanitize(x["response"], x["secure_context"]))
 )
 
-# chain.invoke({"question": "How high is he?", "context": context})
+# pg_chain.invoke({"question": "How high is he?", "context": context})
 
 """
 expected output:
@@ -80,7 +80,7 @@ expected output:
     response_from_llm_after_desanitize,
 
 """
-intermediate_steps_chain = (
+pg_chain_with_intermediate_steps = (
     RunnableMap(
         {
             "prompt_before_sanitize": (lambda x: x)
@@ -125,6 +125,6 @@ intermediate_steps_chain = (
     )
 )
 
-intermediate_steps_chain.invoke(
+pg_chain_with_intermediate_steps.invoke(
     {"question": "How high is he?", "context": context}
 )
