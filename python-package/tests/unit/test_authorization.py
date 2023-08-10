@@ -8,7 +8,7 @@ from typing import Dict, List
 import pytest
 import requests
 from fastapi.exceptions import HTTPException
-from pgdemoserver.authorization import VerifyToken
+from pgchatserver.authorization import VerifyToken
 
 ### Fixtures ###
 

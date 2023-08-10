@@ -38,18 +38,18 @@ jobs:
   ##################   BUILD    ###################
   #################################################
 
-  # Build and push the Promptguard demo server docker image
-  build-promptguard-demo-server:
-    name: Build Promptguard demo server
+  # Build and push the Promptguard chat server docker image
+  build-promptguard-chat-server:
+    name: Build Promptguard chat server
     uses: ./.github/workflows/build-docker.yaml
     needs: [changes]
-    # Rebuild if the Promptguard demo server has changes or if this workflow has changed
+    # Rebuild if the Promptguard chat server has changes or if this workflow has changed
     if: |
-      needs.changes.outputs.has-promptguard-demo-server-changes == 'true' ||
+      needs.changes.outputs.has-promptguard-chat-server-changes == 'true' ||
       contains(needs.changes.outputs.changed-workflows, 'build-docker.yaml') ||
       contains(needs.changes.outputs.changed-workflows, 'main.yaml')
     with:
-      image-name: ghcr.io/opaque-systems/promptguard-demo-server
+      image-name: ghcr.io/opaque-systems/promptguard-chat-server
       docker-context: .
       dockerfile: ./docker/Dockerfile
       base-image-version: ${{ needs.changes.outputs.fallback-image-tag }}

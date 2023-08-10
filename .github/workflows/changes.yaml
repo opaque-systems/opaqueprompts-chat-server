@@ -10,8 +10,8 @@ on:
         type: string
         required: true
     outputs:
-      has-promptguard-demo-server-changes:
-        value: ${{ jobs.changes.outputs.has-promptguard-demo-server-changes }}
+      has-promptguard-chat-server-changes:
+        value: ${{ jobs.changes.outputs.has-promptguard-chat-server-changes }}
       changed-workflows:
         value: ${{ jobs.changes.outputs.changed-workflows }}
       fallback-image-tag:
@@ -24,7 +24,7 @@ jobs:
     outputs:
       # Outputs literal 'true' or 'false' because outputs can only be strings
       # Must be explicitly compared to the string 'true' to produce a boolean
-      has-promptguard-demo-server-changes: ${{ steps.promptguard-demo-server-changes.outputs.any_modified }}
+      has-promptguard-chat-server-changes: ${{ steps.promptguard-chat-server-changes.outputs.any_modified }}
       # String containing space-separated list of changed workflow files
       # Can be used with contains() as if it was an array
       changed-workflows: ${{ steps.workflow-changes.outputs.all_changed_files }}
@@ -36,8 +36,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check Promptguard demo server changes
-        id: promptguard-demo-server-changes
+      - name: Check Promptguard chat server changes
+        id: promptguard-chat-server-changes
         uses: tj-actions/changed-files@v34
         with:
           files: |

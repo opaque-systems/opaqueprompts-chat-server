@@ -1,5 +1,5 @@
 [project]
-name = "pgdemoserver"
+name = "pgchatserver"
 version = "0.0.1"
 description = "A python package used to demonstrate how one would build an integration with the promptguard Python package."
 readme = "README.md"
