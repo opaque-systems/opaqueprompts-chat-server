@@ -1,0 +1,67 @@
+---
+# Initiates the main build-test-deploy workflow.
+name: Main
+
+# Run this workflow on any push or pull request to primary branches
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - release-*
+      - main
+
+permissions:
+  contents: read
+  packages: write
+  checks: write
+  statuses: write
+
+# Only allow one run of this workflow per PR or branch at a time.
+# For PRs, when a new run is triggered the current run will be cancelled.
+# For commits to branches, new runs will be queued.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: Parse changes
+    uses: ./.github/workflows/changes.yaml
+    with:
+      branch-name: ${{ github.base_ref || github.ref_name }}
+
+  #################################################
+  ##################   BUILD    ###################
+  #################################################
+
+  # Build and push the Promptguard demo server docker image
+  build-promptguard-demo-server:
+    name: Build Promptguard demo server
+    uses: ./.github/workflows/build-docker.yaml
+    needs: [changes]
+    # Rebuild if the Promptguard demo server has changes or if this workflow has changed
+    if: |
+      needs.changes.outputs.has-promptguard-demo-server-changes == 'true' ||
+      contains(needs.changes.outputs.changed-workflows, 'build-docker.yaml') ||
+      contains(needs.changes.outputs.changed-workflows, 'main.yaml')
+    with:
+      image-name: ghcr.io/opaque-systems/promptguard-demo-server
+      docker-context: .
+      dockerfile: ./docker/Dockerfile
+      base-image-version: ${{ needs.changes.outputs.fallback-image-tag }}
+
+  #################################################
+  ##################    TEST    ###################
+  #################################################
+
+  #################################################
+  #################   PUBLISH   ###################
+  #################################################
+
+  #################################################
+  ##################   DEPLOY   ###################
+  #################################################

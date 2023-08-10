@@ -1,0 +1,99 @@
+---
+# Builds a docker image and pushes it to Github Container Registry.
+name: Build docker image
+
+# Triggered from main.yaml
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        type: string
+        required: true
+      docker-context:
+        type: string
+        default: .
+        description: Path to the Docker build context, relative to the repo root.
+      dockerfile:
+        type: string
+        default: Dockerfile
+        description: Path to the Dockerfile to build, relative to the repo root.
+      base-image-version:
+        type: string
+        required: true
+    secrets:
+      # Example Dockerfile usage:
+      # RUN --mount=type=secret,id=build_env source /run/secrets/build_env
+      build-env:
+        description: Contents to write to an env file that can be sourced during build steps.
+    outputs:
+      image-name:
+        value: ${{ jobs.build-image.outputs.image-name }}
+      image-version:
+        value: ${{ jobs.build-image.outputs.image-version }}
+      image-tag:
+        value: ${{ jobs.build-image.outputs.image-tag }}
+
+jobs:
+  build-image:
+    name: Build and push docker image
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image-name: ${{ inputs.image-name }}
+      image-version: ${{ steps.meta.outputs.version }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          # Pin buildkit version because v0.11.0 intermittently fails to push to ghcr
+          # https://github.com/docker/build-push-action/issues/761
+          driver-opts: |
+            image=moby/buildkit:v0.10.6
+
+      # Extract metadata from Git reference and GitHub events for later use
+      # for Docker image tagging
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ inputs.image-name }}
+          # Tag image as pr-<num>-<sha> for pull requests and <branch>-<sha> for pushes
+          tags: |
+            type=ref,suffix=-{{sha}},event=branch
+            type=ref,suffix=-{{sha}},event=pr
+
+      - name: Log in to GitHub container registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create secret file to pass to build
+        run: |
+          cat <<EOF > build_env
+          ${{ secrets.build-env }}
+          EOF
+
+      - name: Build and push image to registry
+        # The built image can be found here:
+        # https://github.com/orgs/opaque-systems/packages
+        uses: docker/build-push-action@v4
+        with:
+          context: ${{ inputs.docker-context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: ${{ inputs.dockerfile }}
+          # Look for a cache manifest in the latest image for this branch, or the base branch if this is a PR
+          cache-from: type=registry,ref=${{ inputs.image-name }}:${{ inputs.base-image-version }}
+          # Include a cache manifest in the pushed image
+          cache-to: type=inline
+          # Buildx will safely remove this from the resulting image
+          secret-files: build_env=build_env
