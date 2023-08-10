@@ -1,6 +1,4 @@
 ---
-# Initiates the main build-test-deploy workflow.
-# Currently only includes MP build, integration/end-to-end tests, and MP deployment.
 name: Run tests
 
 # Run this workflow on any push or pull request to primary branches
