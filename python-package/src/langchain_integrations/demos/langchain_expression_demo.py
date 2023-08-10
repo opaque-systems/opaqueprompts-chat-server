@@ -70,4 +70,61 @@ chain = (
     | (lambda x: pgf.desanitize(x["response"], x["secure_context"]))
 )
 
-chain.invoke({"question": "How high is he?", "context": context})
+# chain.invoke({"question": "How high is he?", "context": context})
+
+"""
+expected output:
+    prompt_before_sanitize,
+    prompt_after_sanitize,
+    response_from_llm_before_desanitize,
+    response_from_llm_after_desanitize,
+
+"""
+intermediate_steps_chain = (
+    RunnableMap(
+        {
+            "prompt_before_sanitize": (lambda x: x)
+            | prompt
+            | (lambda p: p.messages[-1].content),
+            "inputs_after_sanitize": (lambda x: pgf.sanitize(x)),
+        }
+    )
+    | RunnableMap(
+        {
+            "prompt_before_sanitize": (lambda x: x["prompt_before_sanitize"]),
+            "prompt_after_sanitize": (
+                lambda x: x["inputs_after_sanitize"]["sanitized_input"]
+            )
+            | prompt
+            | (lambda p: p.messages[-1].content),
+            "response_from_llm_before_desanitize": (
+                lambda x: x["inputs_after_sanitize"]["sanitized_input"]
+            )
+            | prompt
+            | llm
+            | StrOutputParser(),
+            "secure_context": (
+                lambda x: x["inputs_after_sanitize"]["secure_context"]
+            ),
+        }
+    )
+    | RunnableMap(
+        {
+            "prompt_before_sanitize": (lambda x: x["prompt_before_sanitize"]),
+            "prompt_after_sanitize": (lambda x: x["prompt_after_sanitize"]),
+            "response_from_llm_before_desanitize": (
+                lambda x: x["response_from_llm_before_desanitize"]
+            ),
+            "response_from_llm_after_desanitize": (
+                lambda x: pgf.desanitize(
+                    x["response_from_llm_before_desanitize"],
+                    x["secure_context"],
+                )
+            ),
+        }
+    )
+)
+
+intermediate_steps_chain.invoke(
+    {"question": "How high is he?", "context": context}
+)
