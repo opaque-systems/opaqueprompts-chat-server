@@ -1,0 +1,80 @@
+---
+name: Run tests
+
+# Run this workflow on any push or pull request to primary branches
+on:
+  push:
+    branches:
+      - dev
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+  checks: write
+  statuses: write
+
+# Only allow one run of this workflow per PR or branch at a time.
+# For PRs, when a new run is triggered the current run will be cancelled.
+# For commits to branches, new runs will be queued.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  test-auth:
+    name: Build and test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-20.04
+
+    # Test with multiple Python versions
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          # Cache pip packages between runs so we only reinstall dependencies
+          # if requirements.txt has changed
+          cache: 'pip'
+          cache-dependency-path: 'python-package/requirements.txt'
+
+      - name: Build client packages
+        shell: bash
+        run: |
+          # Install requirements
+          pip install -r python-package/requirements.txt
+
+          # Install test requirements
+          pip install -r python-package/tests/requirements.txt
+
+          # Build package
+          pip install python-package/
+
+      # Uncomment this step when we add other unit tests
+      #
+      # Run all tests exception authorization tests.
+      # Authorization tests require hiting an auth0 endpoint that has a rate
+      # limit of 1000 requests per month.
+      # - name: Run tests (except authorization)
+      #   shell: bash
+      #   run: |
+      #       cd python-package/tests/
+      #       python -m pytest --ignore unit/test_authorization.py
+
+      - name: Run authorization tests
+        if: ${{ github.event_name == 'push' }}
+        shell: bash
+        env:
+          PROMPT_GUARD_TEST_SECRET: '${{ secrets.AUTH0_PROMPT_GUARD_TEST_SECRET }}'
+        run: |
+            cd python-package/tests/
+            python -m pytest unit/test_authorization.py

@@ -1,4 +1,7 @@
-fastapi[all]
-uvicorn[standard]
-pydantic
-python-jose
+cryptography==41.0.3
+fastapi[all]==0.101.0
+pydantic==2.1.1
+pyjwt==2.8.0
+python-jose==3.3.0
+requests==2.31.0
+uvicorn[standard]==0.23.2
