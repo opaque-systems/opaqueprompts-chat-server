@@ -62,8 +62,8 @@ jobs:
   #################   PUBLISH   ###################
   #################################################
 
-  publish-promtguard-chat-server:
-    name: Publish chat UI image
+  publish-promptguard-chat-server:
+    name: Publish chat server image
     uses: ./.github/workflows/publish-docker.yaml
     needs: [changes, build-promptguard-chat-server]
 
