@@ -20,7 +20,11 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     sanitized_prompt: str
+    sanitized_response: str
     plaintext_response: str
+    # Unsure if we need this updated_chat_history, seems the easiest way
+    # to ensure it is sent in the right format for the next request
+    # but should confirm with frontend.
     updated_chat_history: str
 
 
@@ -37,6 +41,7 @@ async def chat(
 
     return ChatResponse(
         sanitized_prompt="TODO",
+        sanitized_response="TODO",
         plaintext_response="TODO",
         updated_chat_history="TODO",
     )
