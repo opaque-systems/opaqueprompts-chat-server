@@ -1,0 +1,57 @@
+---
+# Adds a branch tag (ie dev, master) to the specified docker image
+# to mark it as the latest successful build.
+name: Publish docker image
+
+# Triggered from main.yaml
+on:
+  workflow_call:
+    inputs:
+      image-name:
+        type: string
+        required: true
+      image-version:
+        type: string
+        required: true
+
+jobs:
+  tag-image:
+    name: Tag docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Add branch tag to image
+        env:
+          # Pass as env var to prevent script injection because branch names are untrusted user input
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+          IMAGE_NAME: ${{ inputs.image-name }}
+          IMAGE_VERSION: ${{ inputs.image-version }}
+        # Use the Docker REST API instead of 'docker buildx imagetools' or 'docker manifest'
+        # because those produce manifest lists, which Github Container Registry doesn't
+        # display correctly.
+        run: |
+          # Sanitize the branch name
+          BRANCH_LOWERCASE=${BRANCH_NAME,,}
+          # Replace any non-alphanumeric character sequences with a dash
+          BRANCH_ALPHANUMERIC=$(echo "${BRANCH_LOWERCASE}" | sed -r 's/[^a-zA-Z0-9]+/-/g')
+          BRANCH_TRUNCATED=${BRANCH_ALPHANUMERIC:0:40}
+          # Configure Docker API values
+          BEARER_TOKEN="$(echo ${{ secrets.GITHUB_TOKEN }} | base64)"
+          CONTENT_TYPE="application/vnd.docker.distribution.manifest.v2+json"
+          # Convert image name to API url, ie ghcr.io/opaque-systems/opaque/mp
+          # -> https://ghcr.io/v2/opaque-systems/opaque/mp
+          URL="https://${IMAGE_NAME%%/*}/v2/${IMAGE_NAME#*/}"
+          # Get the image manifest
+          MANIFEST=$(
+          curl \
+          -H "Authorization: Bearer ${BEARER_TOKEN}" \
+          -H "Accept: ${CONTENT_TYPE}" \
+          "${URL}/manifests/${IMAGE_VERSION}"
+          )
+          # Push the manifest to the new tag
+          curl -X PUT \
+          -H "Authorization: Bearer ${BEARER_TOKEN}" \
+          -H "Content-Type: ${CONTENT_TYPE}" \
+          -d "${MANIFEST}" \
+          "${URL}/manifests/${BRANCH_TRUNCATED}"

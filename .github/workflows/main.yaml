@@ -62,6 +62,46 @@ jobs:
   #################   PUBLISH   ###################
   #################################################
 
+  publish-promtguard-chat-server:
+    name: Publish chat UI image
+    uses: ./.github/workflows/publish-docker.yaml
+    needs: [changes, build-promptguard-chat-server]
+
+    # Run on commits to primary branches and release PRs
+    # if there is a new client image or this workflow has changed
+    # The always() lets the job still run if upstream jobs were skipped, and the
+    # needs.*.result checks stop the job if upstream jobs failed or were cancelled
+    # See https://github.com/actions/runner/issues/491#issuecomment-907216595
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      (
+        github.event_name == 'push' ||
+        startsWith(github.head_ref, 'release-')
+      )
+      &&
+      (
+        needs.build-promptguard-chat-server.result == 'success' ||
+        contains(needs.changes.outputs.changed-workflows, 'publish-docker.yaml') ||
+        contains(needs.changes.outputs.changed-workflows, 'main.yaml')
+      )
+    with:
+      # If the build was skipped, ie if we're only running because the publish workflow changed,
+      # retag the latest base branch image. Typically this will end up being a no-op unless we are
+      # retagging an existing primary branch image as a release image.
+      image-name: |-
+        ${{
+          needs.build-promptguard-chat-server.outputs.image-name ||
+          'ghcr.io/opaque-systems/promptguard-chat-server'
+        }}
+      image-version: |-
+        ${{
+          needs.build-promptguard-chat-server.outputs.image-version ||
+          needs.changes.outputs.fallback-image-tag
+        }}
+    secrets: inherit
+
   #################################################
   ##################   DEPLOY   ###################
   #################################################
