@@ -4,10 +4,10 @@ from typing import Any
 
 from fastapi import Depends, FastAPI
 from fastapi.security import HTTPBearer
-from pgdemoserver.authorization import VerifyToken
+from pgchatserver.authorization import VerifyToken
 from pydantic import BaseModel
 
-# from pgdemoserver.authorization import token_validator
+# from pgchatserver.authorization import token_validator
 
 app = FastAPI()
 token_auth_scheme = HTTPBearer()

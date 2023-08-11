@@ -1,5 +1,5 @@
 """
-This module handles authentication logic for the promptguard demo server.
+This module handles authentication logic for the promptguard chat server.
 This logic is independent of the langchain integration, and is not needed
 for other servers using the promptguard langchain integration.
 """

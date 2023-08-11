@@ -1,0 +1,69 @@
+---
+# Determines which components have code changes.
+name: Changes
+
+# Triggered from main.yaml
+on:
+  workflow_call:
+    inputs:
+      branch-name:
+        type: string
+        required: true
+    outputs:
+      has-promptguard-chat-server-changes:
+        value: ${{ jobs.changes.outputs.has-promptguard-chat-server-changes }}
+      changed-workflows:
+        value: ${{ jobs.changes.outputs.changed-workflows }}
+      fallback-image-tag:
+        value: ${{ jobs.changes.outputs.fallback-image-tag }}
+
+jobs:
+  changes:
+    name: Parse changed files
+    runs-on: ubuntu-latest
+    outputs:
+      # Outputs literal 'true' or 'false' because outputs can only be strings
+      # Must be explicitly compared to the string 'true' to produce a boolean
+      has-promptguard-chat-server-changes: ${{ steps.promptguard-chat-server-changes.outputs.any_modified }}
+      # String containing space-separated list of changed workflow files
+      # Can be used with contains() as if it was an array
+      changed-workflows: ${{ steps.workflow-changes.outputs.all_changed_files }}
+      fallback-image-tag: ${{ steps.generate-fallback-tag.outputs.fallback_image_tag }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Check Promptguard chat server changes
+        id: promptguard-chat-server-changes
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            python-package/pyproject.toml
+            python-package/requirements.txt
+            python-package/setup.py
+            python-package/src/**
+
+      - name: Check workflow changes
+        id: workflow-changes
+        uses: tj-actions/changed-files@v34
+        with:
+          files: |
+            .github/workflows/**
+
+      - name: Generate Fallback Tag
+        id: generate-fallback-tag
+        env:
+          # Pass as env var to prevent script injection because branch names are untrusted user input
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+          BRANCH_NAME: ${{ inputs.branch-name }}
+        run: |
+          # Sanitize the branch name
+          BRANCH_LOWERCASE=${BRANCH_NAME,,}
+          # Replace any non-alphanumeric character sequences with a dash
+          BRANCH_ALPHANUMERIC=$(echo "${BRANCH_LOWERCASE}" | sed -r 's/[^a-zA-Z0-9]+/-/g')
+          BRANCH_TRUNCATED=${BRANCH_ALPHANUMERIC:0:40}
+          # Set step output
+          echo "fallback_image_tag=${BRANCH_TRUNCATED}" >> "$GITHUB_OUTPUT"
