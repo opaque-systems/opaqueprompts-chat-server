@@ -31,36 +31,46 @@ async def chat(
         required_scopes=["use:opaque-ppp-chat-bot"]
     )
 
-    if not isinstance(chat_request.history, list):
-        raise HTTPException(
-            status_code=400, detail="history must be a list of strings"
-        )
-    if len(chat_request.history) % 2 != 1:
+    """
+    history is a list of strings, where the last string is the user's input.
+    It must have an odd number of strings, as each pair of strings represents
+    a turn in the conversation.
+
+    An example of a valid history is:
+    [HUMAN_MESSAGE1, BOT_RESPONSE1, HUMAN_MESSAGE2, BOT_RESPONSE2, USER_INPUT]
+    """
+    if (
+        not isinstance(chat_request.history, list)
+        or len(chat_request.history) % 2 != 1
+    ):
         raise HTTPException(
             status_code=400,
-            detail="history must have an odd number of strings",
+            detail="history must be a list with an odd number of strings",
         )
 
     prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
     memory = build_memory(chat_request.history)
     llm = OpenAI()
 
-    if os.environ.get("SKIP_INTERMEIDATE_OUTPUTS"):
-        """
-        This is the typical case for LangChain integration.
-        We can get security from PromptGuard by simply wrapping the LLM.
-        e.g. `llm=OpenAI()` -> `llm=PromptGuardLLMWrapper(llm=OpenAI())`
-        """
-        chain = LLMChain(
+    if os.environ.get("WITH_INTERMEDIATE_OUTPUTS"):
+        return get_response(
             prompt=prompt,
-            llm=PromptGuardLLMWrapper(llm=llm),
             memory=memory,
+            input=chat_request.history[-1],
+            llm=llm,
         )
-        return chain.run(chat_request.history[-1])
 
-    return get_response(
-        prompt=prompt, memory=memory, input=chat_request.history[-1], llm=llm
+    """
+    This is the typical case for LangChain integration.
+    We can get security from PromptGuard by simply wrapping the LLM.
+    e.g. `llm=OpenAI()` -> `llm=PromptGuardLLMWrapper(llm=OpenAI())`
+    """
+    chain = LLMChain(
+        prompt=prompt,
+        llm=PromptGuardLLMWrapper(llm=llm),
+        memory=memory,
     )
+    return chain.run(chat_request.history[-1])
 
 
 if __name__ == "__main__":
