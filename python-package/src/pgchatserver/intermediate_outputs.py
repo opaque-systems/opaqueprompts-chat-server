@@ -11,6 +11,21 @@ from pgchatserver.models import ChatResponse
 def get_intermediate_output_chain(
     prompt: ChatPromptTemplate, llm: LLM
 ) -> RunnableSequence:
+    """
+    get intermediate output chain
+
+    Parameters
+    ----------
+    prompt : ChatPromptTemplate
+        the prompt template used by the chain
+    llm : LLM
+        the llm used by the chain
+
+    Returns
+    -------
+    RunnableSequence
+        the intermediate output chain
+    """
     pg_chain: RunnableSequence = (
         RunnableMap(
             {
@@ -57,6 +72,24 @@ def get_response(
     input: str,
     llm: LLM,
 ) -> ChatResponse:
+    """
+    get chat response with intermediate outputs
+
+    Parameters
+    ----------
+    prompt : BasePromptTemplate
+        the prompt template used by the chain
+    memory : ConversationBufferWindowMemory
+        memory that stores the conversation history
+    input : str
+        the user input message
+    llm : LLM
+        the llm used by the chain
+    Returns
+    -------
+    ChatResponse
+        the chat response with intermediate outputs
+    """
     pg_chain = get_intermediate_output_chain(prompt, llm=llm)
     return ChatResponse(
         **pg_chain.invoke(
