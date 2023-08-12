@@ -25,7 +25,6 @@ async def chat(
     chat_request: ChatRequest,
     bearer_token: Any = Depends(token_auth_scheme),
 ) -> Union[ChatResponse, str]:
-    logger.info("chat_request: %s", chat_request)
     # Verify bearer_token
     VerifyToken(bearer_token.credentials).verify(
         required_scopes=["use:opaque-ppp-chat-bot"]
