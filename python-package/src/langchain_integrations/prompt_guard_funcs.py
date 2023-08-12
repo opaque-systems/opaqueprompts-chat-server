@@ -29,7 +29,7 @@ def sanitize(
         sanitize_response: pg.SanitizeResponse = pg.sanitize(input)
         return {
             "sanitized_input": sanitize_response.sanitized_text,
-            "secure_context": sanitize_response.secret_entropy,
+            "secure_context": sanitize_response.secure_context,
         }
 
     if isinstance(input, dict):
@@ -50,7 +50,7 @@ def sanitize(
             idx += 1
         return {
             "sanitized_input": sanitized_input,
-            "secure_context": sanitize_values_response.secret_entropy,
+            "secure_context": sanitize_values_response.secure_context,
         }
 
     raise ValueError(f"Unexpected input type {type(input)}")

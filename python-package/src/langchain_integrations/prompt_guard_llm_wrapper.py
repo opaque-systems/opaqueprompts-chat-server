@@ -82,19 +82,13 @@ class PromptGuardLLMWrapper(LLM):
 
         sanitize_response: SanitizeResponse = sanitize(prompt)
         sanitized_prompt_value_str = sanitize_response.sanitized_text
-        if self.verbose:
-            print("Original prompt from user", prompt)
-            print("sanitized prompt to LLM", sanitized_prompt_value_str)
         llm_response = self.llm.generate_prompt(
             [StringPromptValue(text=sanitized_prompt_value_str)],
         )
         desanitize_response: DesanitizeResponse = desanitize(
             llm_response.generations[0][0].text,
-            secret_entropy=sanitize_response.secret_entropy,
+            secure_context=sanitize_response.secure_context,
         )
-        if self.verbose:
-            print("LLM response", llm_response.generations[0][0].text)
-            print("desanitized response", desanitize_response.desanitized_text)
         return desanitize_response.desanitized_text
 
     @property
