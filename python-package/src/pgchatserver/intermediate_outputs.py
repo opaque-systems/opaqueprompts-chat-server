@@ -58,10 +58,6 @@ def get_response(
     llm: LLM,
 ) -> ChatResponse:
     pg_chain = get_intermediate_output_chain(prompt, llm=llm)
-    import langchain
-
-    langchain.verbose = True
-    langchain.debug = True
     return ChatResponse(
         **pg_chain.invoke(
             {

@@ -25,4 +25,4 @@ class EchoLLM(LLM):
         run_manager: Optional[CallbackManagerForLLMRun] = None,
         **kwargs: Any,
     ) -> str:
-        return "llm response"
+        return prompt

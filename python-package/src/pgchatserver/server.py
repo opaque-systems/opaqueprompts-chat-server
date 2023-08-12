@@ -10,7 +10,6 @@ from langchain_integrations.prompt_guard_llm_wrapper import (
     PromptGuardLLMWrapper,
 )
 from pgchatserver.authorization import VerifyToken
-from pgchatserver.echo_llm import EchoLLM
 from pgchatserver.intermediate_outputs import get_response
 from pgchatserver.memory import build_memory
 from pgchatserver.models import ChatRequest, ChatResponse
@@ -44,10 +43,7 @@ async def chat(
 
     prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
     memory = build_memory(chat_request.history)
-    if os.environ.get("TEST_WITH_ECHO_LLM"):
-        llm = EchoLLM()
-    else:
-        llm = OpenAI()
+    llm = OpenAI()
 
     if os.environ.get("SKIP_INTERMEIDATE_OUTPUTS"):
         """
