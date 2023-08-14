@@ -12,7 +12,14 @@ def get_intermediate_output_chain(
     prompt: ChatPromptTemplate, llm: LLM
 ) -> RunnableSequence:
     """
-    get intermediate output chain
+    Build and return a chain that can give intermediate outputs, using
+    the LangChain expression language. It uses sanitize() and desanitize()
+    from the prompt guard functions to avoid leaking senitive information
+    to the llm.
+
+    This is used by the chat server to get intermediate outputs, which is
+    not a general use case of prompt guard. For a simpler usage of prompt
+    guard, please see `PromptGuardLLMWrapper`.
 
     Parameters
     ----------
@@ -24,27 +31,36 @@ def get_intermediate_output_chain(
     Returns
     -------
     RunnableSequence
-        the intermediate output chain
+        the chain that can give intermediate outputs including
+        `sanitized_prompt`, `raw_response`, `desanitized_response`.
+
+        `sanitized_prompt` is the prompt after sanitization.
+        `raw_response` is the raw response from the llm.
+        `desanitized_response` is the response after desanitization.
     """
     pg_chain: RunnableSequence = (
         RunnableMap(
             {
+                # sanitize the input
                 "inputs_after_sanitize": (lambda x: pgf.sanitize(x)),
             }
         )
         | RunnableMap(
             {
+                # get the sanitized prompt
                 "sanitized_prompt": (
                     lambda x: x["inputs_after_sanitize"]["sanitized_input"][
                         "prompt"
                     ]
                 ),
+                # pass the sanitized input to the llm and get the raw response
                 "raw_response": (
                     lambda x: x["inputs_after_sanitize"]["sanitized_input"]
                 )
                 | prompt
                 | llm
                 | StrOutputParser(),
+                # pass through the secure context from the sanitized input
                 "secure_context": (
                     lambda x: x["inputs_after_sanitize"]["secure_context"]
                 ),
@@ -54,6 +70,7 @@ def get_intermediate_output_chain(
             {
                 "sanitized_prompt": (lambda x: x["sanitized_prompt"]),
                 "raw_response": (lambda x: x["raw_response"]),
+                # desanitize the response
                 "desanitized_response": (
                     lambda x: pgf.desanitize(
                         x["raw_response"],
@@ -73,7 +90,7 @@ def get_response(
     llm: LLM,
 ) -> ChatResponse:
     """
-    get chat response with intermediate outputs
+    Get chat response with intermediate outputs
 
     Parameters
     ----------
@@ -88,7 +105,12 @@ def get_response(
     Returns
     -------
     ChatResponse
-        the chat response with intermediate outputs
+        the chat response with intermediate outputs including
+        `sanitized_prompt`, `raw_response`, `desanitized_response`.
+
+        `sanitized_prompt` is the prompt after sanitization.
+        `raw_response` is the raw response from the llm.
+        `desanitized_response` is the response after desanitization.
     """
     pg_chain = get_intermediate_output_chain(prompt, llm=llm)
     return ChatResponse(
