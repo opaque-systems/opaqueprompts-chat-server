@@ -24,6 +24,24 @@ async def chat(
     chat_request: ChatRequest,
     bearer_token: Any = Depends(token_auth_scheme),
 ) -> ChatResponse:
+    """
+    Secure chat endpoint that uses PromptGuard to protect the user's privacy.
+
+    Parameters
+    ----------
+    chat_request : ChatRequest
+        The request body, which contains the history of the conversation
+        and the prompt to be completed.
+    bearer_token : Any, optional
+        The bearer token, which is used to verify the user's identity.
+
+    Returns
+    -------
+    ChatResponse
+        The response body, which contains the bot's response to the prompt.
+        If `with_intermediate_outputs` is `True`, then the response body
+        also contains the intermediate outputs from PromptGuard and LLM.
+    """
     # Verify bearer_token
     VerifyToken(bearer_token.credentials).verify(
         required_scopes=["use:opaque-ppp-chat-bot"]
@@ -53,11 +71,9 @@ async def chat(
             llm=OpenAI(),
         )
 
-    """
-    This is the typical case for the PromptGuard LangChain integration.
-    We can get security from PromptGuard by simply wrapping the LLM,
-    e.g. `llm=OpenAI()` -> `llm=PromptGuardLLMWrapper(llm=OpenAI())`.
-    """
+    # This is the typical case for the PromptGuard LangChain integration.
+    # We can get security from PromptGuard by simply wrapping the LLM,
+    # e.g. `llm=OpenAI()` -> `llm=PromptGuardLLMWrapper(llm=OpenAI())`.
     chain = LLMChain(
         prompt=prompt,
         llm=PromptGuardLLMWrapper(llm=OpenAI()),

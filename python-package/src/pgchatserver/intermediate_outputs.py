@@ -102,6 +102,7 @@ def get_response(
         the user input message
     llm : LLM
         the llm used by the chain
+
     Returns
     -------
     ChatResponse
