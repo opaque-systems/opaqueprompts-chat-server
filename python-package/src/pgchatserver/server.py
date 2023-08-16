@@ -1,7 +1,9 @@
 import logging
+import os
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from langchain import LLMChain, PromptTemplate
 from langchain.llms import OpenAI
@@ -17,6 +19,27 @@ from pgchatserver.prompt_template import PROMPT_GUARD_TEMPLATE
 app = FastAPI()
 token_auth_scheme = HTTPBearer()
 logger = logging.getLogger(__name__)
+
+
+def _get_origns() -> list[str]:
+    """
+    Get the origins that are allowed to make requests to the chat endpoint.
+
+    Returns
+    -------
+    list[str]
+        The origins that are allowed to make requests to the chat endpoint.
+    """
+    return os.environ.get("ORIGINS", "http://localhost:3000").split(",")
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_get_origns(),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/chat")
