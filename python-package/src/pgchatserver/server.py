@@ -100,7 +100,7 @@ async def chat(
         llm=PromptGuardLLMWrapper(llm=OpenAI()),
         memory=memory,
     )
-    return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))
+    return ChatResponse(desanitized_response=chain.run(chat_request.prompt))
 
 
 if __name__ == "__main__":

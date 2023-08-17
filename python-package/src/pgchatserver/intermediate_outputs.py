@@ -68,10 +68,10 @@ def get_intermediate_output_chain(
         )
         | RunnableMap(
             {
-                "sanitizedPrompt": (lambda x: x["sanitized_prompt"]),
-                "rawResponse": (lambda x: x["raw_response"]),
+                "sanitized_prompt": (lambda x: x["sanitized_prompt"]),
+                "raw_response": (lambda x: x["raw_response"]),
                 # desanitize the response
-                "desanitizedResponse": (
+                "desanitized_response": (
                     lambda x: pgf.desanitize(
                         x["raw_response"],
                         x["secure_context"],

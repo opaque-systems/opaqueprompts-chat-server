@@ -33,8 +33,9 @@ class PromptGuardLLMWrapper(LLM):
 
         extra = Extra.forbid
 
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
+    @staticmethod
+    @root_validator(pre=True, skip_on_failure=True)
+    def validate_environment(values: Dict) -> Dict:
         """Validate that the access token and python package exists
         in environment."""
         token = get_from_dict_or_env(
