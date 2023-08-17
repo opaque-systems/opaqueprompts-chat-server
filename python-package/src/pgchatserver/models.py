@@ -1,5 +1,6 @@
 from typing import Optional
 
+from fastapi_camelcase import CamelModel
 from pydantic import BaseModel
 
 
@@ -9,7 +10,7 @@ class ChatRequest(BaseModel):
     with_intermediate_outputs: bool = True
 
 
-class ChatResponse(BaseModel):
+class ChatResponse(CamelModel):
     desanitized_response: str
     sanitized_prompt: Optional[str]
     raw_response: Optional[str]
