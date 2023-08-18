@@ -1,4 +1,4 @@
-import langchain_integrations.prompt_guard_funcs as pgf
+import pgchatserver.prompt_guard_funcs as pgf
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import ChatPromptTemplate

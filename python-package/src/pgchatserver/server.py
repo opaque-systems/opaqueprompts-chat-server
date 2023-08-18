@@ -7,13 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from langchain import LLMChain, PromptTemplate
 from langchain.llms import OpenAI
-from langchain_integrations.prompt_guard_llm_wrapper import (
-    PromptGuardLLMWrapper,
-)
 from pgchatserver.authorization import VerifyToken
 from pgchatserver.intermediate_outputs import get_response
 from pgchatserver.memory import build_memory
 from pgchatserver.models import ChatRequest, ChatResponse
+from pgchatserver.prompt_guard_llm_wrapper import PromptGuardLLMWrapper
 from pgchatserver.prompt_template import PROMPT_GUARD_TEMPLATE
 
 app = FastAPI()
