@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.llms.base import LLM
 from langchain.prompts.base import StringPromptValue
+from langchain.pydantic_v1 import Extra, root_validator
 from langchain.utils import get_from_dict_or_env
-from pydantic import Extra, root_validator
 
 logger = logging.getLogger(__name__)
 

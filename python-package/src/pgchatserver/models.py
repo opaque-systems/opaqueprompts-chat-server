@@ -11,5 +11,5 @@ class ChatRequest(BaseModel):
 
 class ChatResponse(BaseModel):
     desanitized_response: str
-    sanitized_prompt: Optional[str]
-    raw_response: Optional[str]
+    sanitized_prompt: Optional[str] = None
+    raw_response: Optional[str] = None
