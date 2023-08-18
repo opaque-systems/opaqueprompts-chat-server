@@ -7,4 +7,3 @@ pyjwt==2.8.0
 python-jose==3.3.0
 requests==2.31.0
 uvicorn[standard]==0.23.2
-fastapi_camelcase==1.0.5
