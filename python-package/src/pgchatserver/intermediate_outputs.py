@@ -32,11 +32,11 @@ def get_intermediate_output_chain(
     -------
     RunnableSequence
         the chain that can give intermediate outputs including
-        `sanitized_prompt`, `raw_response`, `desanitized_response`.
+        `sanitizedPrompt`, `rawResponse`, and `desanitizedResponse`.
 
-        `sanitized_prompt` is the prompt after sanitization.
-        `raw_response` is the raw response from the llm.
-        `desanitized_response` is the response after desanitization.
+        `sanitizedPrompt` is the prompt after sanitization.
+        `rawResponse` is the raw response from the llm.
+        `desanitizedResponse` is the response after desanitization.
     """
     pg_chain: RunnableSequence = (
         RunnableMap(
@@ -68,10 +68,10 @@ def get_intermediate_output_chain(
         )
         | RunnableMap(
             {
-                "sanitized_prompt": (lambda x: x["sanitized_prompt"]),
-                "raw_response": (lambda x: x["raw_response"]),
+                "sanitizedPrompt": (lambda x: x["sanitized_prompt"]),
+                "rawResponse": (lambda x: x["raw_response"]),
                 # desanitize the response
-                "desanitized_response": (
+                "desanitizedResponse": (
                     lambda x: pgf.desanitize(
                         x["raw_response"],
                         x["secure_context"],
@@ -107,11 +107,11 @@ def get_response(
     -------
     ChatResponse
         the chat response with intermediate outputs including
-        `sanitized_prompt`, `raw_response`, `desanitized_response`.
+        `sanitizedPrompt`, `rawResponse`, and `desanitizedResponse`.
 
-        `sanitized_prompt` is the prompt after sanitization.
-        `raw_response` is the raw response from the llm.
-        `desanitized_response` is the response after desanitization.
+        `sanitizedPrompt` is the prompt after sanitization.
+        `rawResponse` is the raw response from the llm.
+        `desanitizedResponse` is the response after desanitization.
     """
     pg_chain = get_intermediate_output_chain(prompt, llm=llm)
     return ChatResponse(
