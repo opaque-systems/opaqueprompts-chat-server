@@ -36,7 +36,7 @@ def sanitize(
         values = list()
         for key in input:
             values.append(input[key])
-        input_value_str = json.dumps(values)
+        input_value_str = json.dumps(values, ensure_ascii=False)
         sanitize_values_response: pg.SanitizeResponse = pg.sanitize(
             input_value_str
         )
