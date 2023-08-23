@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from langchain import LLMChain, PromptTemplate
 from langchain.llms import OpenAI
-from langchain.llms.promptguard import PromptGuardLLMWrapper
+from langchain.llms.promptguard import PromptGuard
 from pgchatserver.authorization import VerifyToken
 from pgchatserver.intermediate_outputs import get_response
 from pgchatserver.memory import build_memory
@@ -94,10 +94,10 @@ async def chat(
 
     # This is the typical case for the PromptGuard LangChain integration.
     # We can get security from PromptGuard by simply wrapping the LLM,
-    # e.g. `llm=OpenAI()` -> `llm=PromptGuardLLMWrapper(llm=OpenAI())`.
+    # e.g. `llm=OpenAI()` -> `llm=PromptGuard(base_llm=OpenAI())`.
     chain = LLMChain(
         prompt=prompt,
-        llm=PromptGuardLLMWrapper(llm=OpenAI()),
+        llm=PromptGuard(base_llm=OpenAI()),
         memory=memory,
     )
     return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))
