@@ -12,7 +12,7 @@ WORKDIR $PKG_SRC_DIR
 
 # Install Python dependencies
 RUN pip install git+https://github.com/opaque-systems/atls-python.git#subdirectory=python-package
-RUN pip install git+https://github.com/opaque-systems/promptguard-python.git#subdirectory=python-package-prompt-guard
+RUN pip install git+https://github.com/opaque-systems/promptguard-python.git#subdirectory=python-package
 RUN pip install -r requirements.txt
 
 # Install chat server Python package
