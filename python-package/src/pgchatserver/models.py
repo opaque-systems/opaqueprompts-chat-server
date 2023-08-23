@@ -1,10 +1,10 @@
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
 
 class ChatRequest(BaseModel):
-    history: Optional[list[str]]
+    history: Optional[List[str]]
     prompt: str
     with_intermediate_outputs: bool = True
 
