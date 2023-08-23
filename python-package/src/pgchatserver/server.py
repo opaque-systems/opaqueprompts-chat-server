@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any
+from typing import Any, List
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,13 +19,13 @@ token_auth_scheme = HTTPBearer()
 logger = logging.getLogger(__name__)
 
 
-def _get_origns() -> list[str]:
+def _get_origns() -> List[str]:
     """
     Get the origins that are allowed to make requests to the chat endpoint.
 
     Returns
     -------
-    list[str]
+    list of str
         The origins that are allowed to make requests to the chat endpoint.
     """
     return os.environ.get("ORIGINS", "http://localhost:3000").split(",")
