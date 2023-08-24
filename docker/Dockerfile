@@ -11,6 +11,7 @@ COPY python-package/ $PKG_SRC_DIR
 WORKDIR $PKG_SRC_DIR
 
 # Install Python dependencies
+# TODO: Remove this line once official langchain is up to date.
 RUN pip install git+https://github.com/opaque-systems/langchain.git#subdirectory=libs/langchain
 RUN pip install -r requirements.txt
 

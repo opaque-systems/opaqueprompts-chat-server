@@ -45,6 +45,7 @@ jobs:
             python-package/requirements.txt
             python-package/setup.py
             python-package/src/**
+            docker/Dockerfile
 
       - name: Check workflow changes
         id: workflow-changes
