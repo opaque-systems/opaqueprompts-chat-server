@@ -26,6 +26,8 @@ Then, to run the service with exposed port 8000:
 docker run -e PROMPTGUARD_SERVER_HOSTNAME=$PROMPTGUARD_SERVER_HOSTNAME -e PROMPTGUARD_SERVER_PORT=$PROMPTGUARD_SERVER_PORT -e OPENAI_API_KEY=$OPENAI_API_KEY -e PROMPTGUARD_API_KEY=$PROMPTGUARD_API_KEY -p 8000:8000 ghcr.io/opaque-systems/promptguard-chat-server:dev
 ```
 
+Alternatively, you can set the environment variables in a file and [pass that file in with `--env-file`](https://docs.docker.com/engine/reference/commandline/run/#env).
+
 For debugging a running container:
 ```
 docker exec -it <Container Name> /bin/bash
