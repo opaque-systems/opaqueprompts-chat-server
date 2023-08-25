@@ -18,7 +18,7 @@ Before running the service, you'll need to set the following environment variabl
 * `PROMPTGUARD_SERVER_HOSTNAME`: The IP address / hostname of the PromptGuard service running on ACI
 * `PROMPTGUARD_SERVER_PORT`: The port of the PromptGuard service running on ACI
 * `OPENAI_API_KEY`: Your OpenAI API key
-* `PROMPTGUARD_API_KEY`: Your PromptGuard API key. This can be retrieved by running the `curl` command found in the secure note in Bitwarden titled "PROMPTGUARD_CHAT_SERVER_SECRET"
+* `PROMPTGUARD_API_KEY`: Your PromptGuard API key.
 
 Then, to run the service with exposed port 8000:
 
