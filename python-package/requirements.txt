@@ -1,6 +1,6 @@
 cryptography==41.0.3
 fastapi[all]==0.101.0
-langchain==0.0.271
+langchain @ git+https://github.com/opaque-systems/langchain.git#subdirectory=libs/langchain
 pydantic==2.1.1
 pyjwt==2.8.0
 python-jose==3.3.0
