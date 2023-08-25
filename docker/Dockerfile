@@ -18,4 +18,4 @@ RUN pip install .
 
 EXPOSE 8000
 
-ENTRYPOINT [ "uvicorn", "src.pgchatserver.server:app" ]
+ENTRYPOINT [ "uvicorn", "src.pgchatserver.server:app", "0.0.0.0" ]
