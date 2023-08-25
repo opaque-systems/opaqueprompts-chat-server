@@ -82,7 +82,13 @@ async def chat(
         )
 
     prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
-    memory = build_memory(chat_request.history)
+    # In the intermediate value case, we use a unique identifier in the place
+    # of the normal "AI:" and "Human:" tags to facilitate more advanced
+    # pre-proccessing
+    memory = build_memory(
+        chat_request.history,
+        use_unique_identifier=chat_request.with_intermediate_outputs,
+    )
 
     if chat_request.with_intermediate_outputs:
         return get_response(
