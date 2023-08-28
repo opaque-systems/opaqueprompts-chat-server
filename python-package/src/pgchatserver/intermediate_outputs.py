@@ -160,6 +160,8 @@ def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
     # Convert history from an array of chat messages to a dictionary
     history = unsanitized_input.pop("history")
     split_history = [message.content for message in history]
+    if len(split_history) % 2 != 0:
+        raise Exception("History must be an even length string")
     for i, chat_message in enumerate(split_history):
         prefix = "Human"
         if i % 2 == 1:
