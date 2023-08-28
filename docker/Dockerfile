@@ -11,7 +11,6 @@ COPY python-package/ $PKG_SRC_DIR
 WORKDIR $PKG_SRC_DIR
 
 # Install Python dependencies
-RUN pip install git+https://github.com/opaque-systems/langchain.git#subdirectory=libs/langchain
 RUN pip install -r requirements.txt
 
 # Install chat server Python package
