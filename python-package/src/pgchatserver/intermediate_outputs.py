@@ -7,7 +7,6 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.schema import BasePromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableMap, RunnableSequence
-from pgchatserver.memory import UNIQUE_IDENTIFIER
 from pgchatserver.models import ChatResponse
 
 
@@ -121,16 +120,16 @@ def get_response(
         **pg_chain.invoke(
             {
                 "prompt": input,
-                "history": memory.load_memory_variables({})["history"],
+                "history": memory.buffer_as_messages,
             }
         )
     )
 
 
-def _sanitize(unsanitized_input: Dict[str, str]) -> Dict[str, Any]:
+def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
     """
     Helper function which splits up the history part of the prompt prior to
-    sanitizing it in order to improve thepromptguard sanitize functions
+    sanitizing it in order to improve the PromptGuard sanitize functions
     performance. The function then combines the history field back together.
 
     Parameters
@@ -152,26 +151,25 @@ def _sanitize(unsanitized_input: Dict[str, str]) -> Dict[str, Any]:
 
         The `secure_context` needs to be passed to the `desanitize` function.
     """
-    if not ("history" in unsanitized_input and unsanitized_input["history"]):
+    if "history" not in unsanitized_input:
         return pgf.sanitize(unsanitized_input)
-
-    # Split history into each individual message
+    # Convert history from an array of chat messages to a dictionary
     history = unsanitized_input.pop("history")
-    # Need to cut out the first entry as it will always just be an empty string
-    split_history = history.split(UNIQUE_IDENTIFIER + ":")[1:]
+    split_history = [message.content for message in history]
     for i, chat_message in enumerate(split_history):
         prefix = "Human"
         if i % 2 == 1:
             prefix = "Ai"
         unsanitized_input[f"{prefix} {i//2 + 1}"] = chat_message
     sanitized_response = pgf.sanitize(unsanitized_input)
-    # Reconstruct original history with the sanitized messages
+    # Reconstruct original history str with the sanitized messages
     sanitized_input = sanitized_response["sanitized_input"]
 
     history_str = ""
     for i in range(1, len(split_history) // 2 + 1):
         human_message = sanitized_input.pop(f"Human {i}")
         ai_message = sanitized_input.pop(f"Ai {i}")
-        history_str += f"Human:{human_message}AI:{ai_message}"
+        history_str += f"Human: {human_message}AI: {ai_message}"
     sanitized_input["history"] = history_str
+    print(history_str)
     return sanitized_response
