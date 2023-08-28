@@ -132,12 +132,16 @@ def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
     sanitizing it in order to improve the PromptGuard sanitize functions
     performance. The function then combines the history field back together.
 
+    This function wraps the call to pgf.sanitize().
+
     Parameters
     ----------
-    unsanitized_input : dict of str to str
+    unsanitized_input : dict
         The unsanitized input that needs to be sanitized. If it does not
         contain the "history" key, it will just be passed directly to
-        pgf.sanitize
+        pgf.sanitize. If the history key is contained in the dictionary then
+        it should contain a list of alternating HumanMessage and AIMessage
+        objects and even length.
 
     Returns
     -------
@@ -171,5 +175,4 @@ def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
         ai_message = sanitized_input.pop(f"Ai {i}")
         history_str += f"Human: {human_message}AI: {ai_message}"
     sanitized_input["history"] = history_str
-    print(history_str)
     return sanitized_response
