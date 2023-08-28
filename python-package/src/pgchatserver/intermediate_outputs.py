@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import langchain.utilities.promptguard as pgf
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferWindowMemory
@@ -42,7 +44,7 @@ def get_intermediate_output_chain(
         RunnableMap(
             {
                 # sanitize the input
-                "inputs_after_sanitize": (lambda x: pgf.sanitize(x)),
+                "inputs_after_sanitize": (_sanitize),
             }
         )
         | RunnableMap(
@@ -118,7 +120,61 @@ def get_response(
         **pg_chain.invoke(
             {
                 "prompt": input,
-                "history": memory.load_memory_variables({})["history"],
+                "history": memory.buffer_as_messages,
             }
         )
     )
+
+
+def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Helper function which splits up the history part of the prompt prior to
+    sanitizing it in order to improve the PromptGuard sanitize functions
+    performance. The function then combines the history field back together.
+
+    This function wraps the call to pgf.sanitize().
+
+    Parameters
+    ----------
+    unsanitized_input : dict
+        The unsanitized input that needs to be sanitized. If it does not
+        contain the "history" key, it will just be passed directly to
+        pgf.sanitize. If the history key is contained in the dictionary then
+        it should contain a list of alternating HumanMessage and AIMessage
+        objects and even length.
+
+    Returns
+    -------
+    dict
+        Sanitized input dict of strings and the secure context
+        as a dict following the format:
+        {
+            "sanitized_input": <sanitized form of unsanitized_input (dict)>,
+            "secure_context": <secure context (str)>
+        }
+
+        The `secure_context` needs to be passed to the `desanitize` function.
+    """
+    if "history" not in unsanitized_input:
+        return pgf.sanitize(unsanitized_input)
+    # Convert history from an array of chat messages to a dictionary
+    history = unsanitized_input.pop("history")
+    split_history = [message.content for message in history]
+    if len(split_history) % 2 != 0:
+        raise Exception("History must be an even length string")
+    for i, chat_message in enumerate(split_history):
+        prefix = "Human"
+        if i % 2 == 1:
+            prefix = "Ai"
+        unsanitized_input[f"{prefix} {i//2 + 1}"] = chat_message
+    sanitized_response = pgf.sanitize(unsanitized_input)
+    # Reconstruct original history str with the sanitized messages
+    sanitized_input = sanitized_response["sanitized_input"]
+
+    history_str = ""
+    for i in range(1, len(split_history) // 2 + 1):
+        human_message = sanitized_input.pop(f"Human {i}")
+        ai_message = sanitized_input.pop(f"Ai {i}")
+        history_str += f"Human: {human_message}AI: {ai_message}"
+    sanitized_input["history"] = history_str
+    return sanitized_response
