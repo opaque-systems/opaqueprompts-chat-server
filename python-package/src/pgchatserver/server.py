@@ -9,7 +9,6 @@ from fastapi.security import HTTPBearer
 from langchain import LLMChain, PromptTemplate
 from langchain.llms import OpenAI
 from langchain.llms.promptguard import PromptGuard
-from openai.error import OpenAIError
 from pgchatserver.authorization import VerifyToken
 from pgchatserver.intermediate_outputs import get_response
 from pgchatserver.memory import build_memory
@@ -106,12 +105,6 @@ async def chat(
     except HTTPException as e:
         logger.exception(e)
         raise e
-    except OpenAIError as e:
-        logger.exception(e)
-        raise HTTPException(
-            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-            detail=str(e),
-        )
     except Exception as e:
         logger.exception(e)
         raise HTTPException(
