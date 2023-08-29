@@ -1,5 +1,6 @@
 import logging
 import os
+from http import HTTPStatus
 from typing import Any, List
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -63,44 +64,53 @@ async def chat(
         If `with_intermediate_outputs` is `True`, then the response body
         also contains the intermediate outputs from PromptGuard and LLM.
     """
-    # Verify bearer_token
-    VerifyToken(bearer_token.credentials).verify(
-        required_scopes=["use:opaque-ppp-chat-bot"]
-    )
-
-    # `history` must be a list with an even number of strings,
-    # because each pair of strings represents
-    # a turn in the conversation. An example of a valid history is:
-    # `[HUMAN_MESSAGE1, BOT_RESPONSE1, HUMAN_MESSAGE2, BOT_RESPONSE2]`.
-    if (
-        not isinstance(chat_request.history, list)
-        or len(chat_request.history) % 2 != 0
-    ):
-        raise HTTPException(
-            status_code=400,
-            detail="history must be a list with an even number of strings",
+    try:
+        # Verify bearer_token
+        VerifyToken(bearer_token.credentials).verify(
+            required_scopes=["use:opaque-ppp-chat-bot"]
         )
 
-    prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
-    memory = build_memory(chat_request.history)
+        # `history` must be a list with an even number of strings,
+        # because each pair of strings represents
+        # a turn in the conversation. An example of a valid history is:
+        # `[HUMAN_MESSAGE1, BOT_RESPONSE1, HUMAN_MESSAGE2, BOT_RESPONSE2]`.
+        if (
+            not isinstance(chat_request.history, list)
+            or len(chat_request.history) % 2 != 0
+        ):
+            raise HTTPException(
+                status_code=400,
+                detail="history must be a list with an even number of strings",
+            )
+        prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
+        memory = build_memory(chat_request.history)
 
-    if chat_request.with_intermediate_outputs:
-        return get_response(
+        if chat_request.with_intermediate_outputs:
+            return get_response(
+                prompt=prompt,
+                memory=memory,
+                input=chat_request.prompt,
+                llm=OpenAI(),
+            )
+
+        # This is the typical case for the PromptGuard LangChain integration.
+        # We can get security from PromptGuard by simply wrapping the LLM,
+        # e.g. `llm=OpenAI()` -> `llm=PromptGuard(base_llm=OpenAI())`.
+        chain = LLMChain(
             prompt=prompt,
+            llm=PromptGuard(base_llm=OpenAI()),
             memory=memory,
-            input=chat_request.prompt,
-            llm=OpenAI(),
         )
-
-    # This is the typical case for the PromptGuard LangChain integration.
-    # We can get security from PromptGuard by simply wrapping the LLM,
-    # e.g. `llm=OpenAI()` -> `llm=PromptGuard(base_llm=OpenAI())`.
-    chain = LLMChain(
-        prompt=prompt,
-        llm=PromptGuard(base_llm=OpenAI()),
-        memory=memory,
-    )
-    return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))
+        return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))
+    except HTTPException as e:
+        logger.exception(e)
+        raise e
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(
+            status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+            detail=str(e),
+        )
 
 
 if __name__ == "__main__":
