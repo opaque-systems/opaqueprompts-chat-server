@@ -20,8 +20,8 @@ def get_intermediate_output_chain(
     to the llm.
 
     This is used by the chat server to get intermediate outputs, which is
-    not a general use case of OpaquePrompts. For a simpler usage of prompt
-    guard, please see `OpaquePromptsLLMWrapper`.
+    not a general use case of OpaquePrompts.
+    For a simpler usage of OpaquePrompts, please see `OpaquePromptsLLMWrapper`.
 
     Parameters
     ----------

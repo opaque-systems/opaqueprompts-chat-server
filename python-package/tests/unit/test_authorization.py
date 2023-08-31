@@ -14,7 +14,7 @@ from opchatserver.authorization import VerifyToken
 
 
 @pytest.fixture(scope="session")
-def prompt_guard_test_secret() -> str:
+def opaqueprompts_test_secret() -> str:
     client_secret = os.environ.get("OPAQUEPROMPTS_TEST_SECRET")
     if not client_secret:
         pytest.fail(
@@ -25,13 +25,13 @@ def prompt_guard_test_secret() -> str:
 
 
 @pytest.fixture(scope="session")
-def auth0_access_token(prompt_guard_test_secret: str) -> str:
+def auth0_access_token(opaqueprompts_test_secret: str) -> str:
     headers: Dict[str, str] = {
         "content-type": "application/x-www-form-urlencoded"
     }
     data: Dict[str, str] = {
         "client_id": "Dk4QObdUPC2pFTkNJENiK0mmxBR3ubaE",
-        "client_secret": prompt_guard_test_secret,
+        "client_secret": opaqueprompts_test_secret,
         "audience": VerifyToken.audience,
         "grant_type": "client_credentials",
     }
