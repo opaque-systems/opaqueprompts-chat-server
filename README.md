@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a chat server that uses the [OpaquePrompts API](https://opaqueprompts.readthedocs.io/en/latest/) to build a LLM application protected by confidential computing. OpaquePrompts is a privacy layer around LLMs that hides sensitive data from the model provider. You can find a deployed version of this chat server on the [OpaquePrompts website (https://opaqueprompts.opaque.co).
+This is a chat server that uses the [OpaquePrompts API](https://opaqueprompts.readthedocs.io/en/latest/) to build a LLM application protected by confidential computing. OpaquePrompts is a privacy layer around LLMs that hides sensitive data from the model provider. You can find a deployed version of this chat server on the [OpaquePrompts website](https://opaqueprompts.opaque.co).
 
 ## OpaquePrompts LangChain Integration
 
