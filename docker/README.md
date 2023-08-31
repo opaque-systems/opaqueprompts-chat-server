@@ -3,27 +3,27 @@
 ### Installing
 From the repo root, run:
 ```
-docker build --file docker/Dockerfile . --tag promptguard-chat-server
+docker build --file docker/Dockerfile . --tag opaqueprompts-chat-server
 ```
 
-Or pull the image from [GHCR](https://github.com/opaque-systems/promptguard-chat-server/pkgs/container/promptguard-chat-server):
+Or pull the image from [GHCR](https://github.com/opaque-systems/opaqueprompts-chat-server/pkgs/container/opaqueprompts-chat-server):
 
 ```bash
-docker pull ghcr.io/opaque-systems/promptguard-chat-server:dev
+docker pull ghcr.io/opaque-systems/opaqueprompts-chat-server:dev
 ```
 
 ### Running
 Before running the service, you'll need to set the following environment variables:
 
-* `PROMPTGUARD_SERVER_HOSTNAME`: The IP address / hostname of the PromptGuard service running on ACI
-* `PROMPTGUARD_SERVER_PORT`: The port of the PromptGuard service running on ACI
+* `OPAQUEPROMPTS_SERVER_HOSTNAME`: The IP address / hostname of the OpaquePrompts service running on ACI
+* `OPAQUEPROMPTS_SERVER_PORT`: The port of the OpaquePrompts service running on ACI
 * `OPENAI_API_KEY`: Your OpenAI API key
-* `PROMPTGUARD_API_KEY`: Your PromptGuard API key.
+* `OPAQUEPROMPTS_API_KEY`: Your OpaquePrompts API key.
 
 Then, to run the service with exposed port 8000:
 
 ```
-docker run -e PROMPTGUARD_SERVER_HOSTNAME=$PROMPTGUARD_SERVER_HOSTNAME -e PROMPTGUARD_SERVER_PORT=$PROMPTGUARD_SERVER_PORT -e OPENAI_API_KEY=$OPENAI_API_KEY -e PROMPTGUARD_API_KEY=$PROMPTGUARD_API_KEY -p 8000:8000 ghcr.io/opaque-systems/promptguard-chat-server:dev
+docker run -e OPAQUEPROMPTS_SERVER_HOSTNAME=$OPAQUEPROMPTS_SERVER_HOSTNAME -e OPAQUEPROMPTS_SERVER_PORT=$OPAQUEPROMPTS_SERVER_PORT -e OPENAI_API_KEY=$OPENAI_API_KEY -e OPAQUEPROMPTS_API_KEY=$OPAQUEPROMPTS_API_KEY -p 8000:8000 ghcr.io/opaque-systems/opaqueprompts-chat-server:dev
 ```
 
 Alternatively, you can set the environment variables in a file and [pass that file in with `--env-file`](https://docs.docker.com/engine/reference/commandline/run/#env).

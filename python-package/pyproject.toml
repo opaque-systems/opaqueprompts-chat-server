@@ -1,7 +1,7 @@
 [project]
-name = "pgchatserver"
+name = "opchatserver"
 version = "0.0.1"
-description = "A python package used to demonstrate how one would build an integration with the promptguard Python package."
+description = "A python package used to demonstrate how one would build an integration with the opaqueprompts Python package."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [

@@ -1,7 +1,7 @@
 # flake8: noqa
 # pylint: skip-file
 
-PROMPT_GUARD_TEMPLATE = """As an AI assistant, you will be helpful and patient.
+OPAQUEPROMPTS_TEMPLATE = """As an AI assistant, you will be helpful and patient.
 
 Important PII data is sanitized in the question.
 For example, "Giana is good" is sanitized to "PERSON_999 is good".

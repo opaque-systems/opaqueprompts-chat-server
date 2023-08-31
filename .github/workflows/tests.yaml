@@ -74,7 +74,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         shell: bash
         env:
-          PROMPT_GUARD_TEST_SECRET: '${{ secrets.AUTH0_PROMPT_GUARD_TEST_SECRET }}'
+          OPAQUEPROMPTS_TEST_SECRET: '${{ secrets.AUTH0_OPAQUEPROMPTS_TEST_SECRET }}'
         run: |
             cd python-package/tests/
             python -m pytest unit/test_authorization.py

@@ -8,30 +8,30 @@ from typing import Dict, List
 import pytest
 import requests
 from fastapi.exceptions import HTTPException
-from pgchatserver.authorization import VerifyToken
+from opchatserver.authorization import VerifyToken
 
 ### Fixtures ###
 
 
 @pytest.fixture(scope="session")
-def prompt_guard_test_secret() -> str:
-    client_secret = os.environ.get("PROMPT_GUARD_TEST_SECRET")
+def opaqueprompts_test_secret() -> str:
+    client_secret = os.environ.get("OPAQUEPROMPTS_TEST_SECRET")
     if not client_secret:
         pytest.fail(
-            "PROMPT_GUARD_TEST_SECRET environment variable must be set for"
+            "OPAQUEPROMPTS_TEST_SECRET environment variable must be set for"
             "this test"
         )
     return client_secret  # type: ignore
 
 
 @pytest.fixture(scope="session")
-def auth0_access_token(prompt_guard_test_secret: str) -> str:
+def auth0_access_token(opaqueprompts_test_secret: str) -> str:
     headers: Dict[str, str] = {
         "content-type": "application/x-www-form-urlencoded"
     }
     data: Dict[str, str] = {
         "client_id": "Dk4QObdUPC2pFTkNJENiK0mmxBR3ubaE",
-        "client_secret": prompt_guard_test_secret,
+        "client_secret": opaqueprompts_test_secret,
         "audience": VerifyToken.audience,
         "grant_type": "client_credentials",
     }
@@ -45,7 +45,7 @@ def auth0_access_token(prompt_guard_test_secret: str) -> str:
     if user_auth_response_payload.get("error"):
         pytest.fail(
             """
-            Failed to get auth0 access token fromPROMPT_GUARD_TEST_SECRET,
+            Failed to get auth0 access token from OPAQUEPROMPTS_TEST_SECRET,
             please ensure the value is correct
             """
         )

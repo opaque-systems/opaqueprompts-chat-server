@@ -1,13 +1,13 @@
 from typing import Any, Dict
 
-import langchain.utilities.promptguard as pgf
+import langchain.utilities.opaqueprompts as op
 from langchain.llms.base import LLM
 from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import BasePromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnableMap, RunnableSequence
-from pgchatserver.models import ChatResponse
+from opchatserver.models import ChatResponse
 
 
 def get_intermediate_output_chain(
@@ -16,12 +16,12 @@ def get_intermediate_output_chain(
     """
     Build and return a chain that can give intermediate outputs, using
     the LangChain expression language. It uses sanitize() and desanitize()
-    from the prompt guard functions to avoid leaking senitive information
+    from the OpaquePrompts functions to avoid leaking senitive information
     to the llm.
 
     This is used by the chat server to get intermediate outputs, which is
-    not a general use case of prompt guard. For a simpler usage of prompt
-    guard, please see `PromptGuardLLMWrapper`.
+    not a general use case of OpaquePrompts.
+    For a simpler usage of OpaquePrompts, please see `OpaquePromptsLLMWrapper`.
 
     Parameters
     ----------
@@ -74,7 +74,7 @@ def get_intermediate_output_chain(
                 "rawResponse": (lambda x: x["raw_response"]),
                 # desanitize the response
                 "desanitizedResponse": (
-                    lambda x: pgf.desanitize(
+                    lambda x: op.desanitize(
                         x["raw_response"],
                         x["secure_context"],
                     )
@@ -129,17 +129,17 @@ def get_response(
 def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
     """
     Helper function which splits up the history part of the prompt prior to
-    sanitizing it in order to improve the PromptGuard sanitize functions
+    sanitizing it in order to improve the OpaquePrompts sanitize functions
     performance. The function then combines the history field back together.
 
-    This function wraps the call to pgf.sanitize().
+    This function wraps the call to op.sanitize().
 
     Parameters
     ----------
     unsanitized_input : dict
         The unsanitized input that needs to be sanitized. If it does not
         contain the "history" key, it will just be passed directly to
-        pgf.sanitize. If the history key is contained in the dictionary then
+        op.sanitize. If the history key is contained in the dictionary then
         it should contain a list of alternating HumanMessage and AIMessage
         objects and even length.
 
@@ -156,7 +156,7 @@ def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
         The `secure_context` needs to be passed to the `desanitize` function.
     """
     if "history" not in unsanitized_input:
-        return pgf.sanitize(unsanitized_input)
+        return op.sanitize(unsanitized_input)
     # Convert history from an array of chat messages to a dictionary
     history = unsanitized_input.pop("history")
     split_history = [message.content for message in history]
@@ -167,7 +167,7 @@ def _sanitize(unsanitized_input: Dict[str, Any]) -> Dict[str, Any]:
         if i % 2 == 1:
             prefix = "Ai"
         unsanitized_input[f"{prefix} {i//2 + 1}"] = chat_message
-    sanitized_response = pgf.sanitize(unsanitized_input)
+    sanitized_response = op.sanitize(unsanitized_input)
     # Reconstruct original history str with the sanitized messages
     sanitized_input = sanitized_response["sanitized_input"]
 

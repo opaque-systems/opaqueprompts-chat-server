@@ -1,6 +1,6 @@
 FROM python:3.10.12-slim-bookworm
 
-ENV PKG_SRC_DIR /pgchatserver
+ENV PKG_SRC_DIR /opchatserver
 
 RUN apt update && \
     apt upgrade -y && \
@@ -18,4 +18,4 @@ RUN pip install .
 
 EXPOSE 8000
 
-ENTRYPOINT [ "uvicorn", "src.pgchatserver.server:app", "--host", "0.0.0.0" ]
+ENTRYPOINT [ "uvicorn", "src.opchatserver.server:app", "--host", "0.0.0.0" ]
