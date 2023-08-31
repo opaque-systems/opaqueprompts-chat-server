@@ -4,6 +4,7 @@ A simple HTTP server based on FastAPI used to interact with the `opaqueprompts` 
 
 ## Running the server
 Run the server using `uvicorn`:
+
 ```
 uvicorn --app-dir src/opchatserver server:app --reload --host 0.0.0.0
 ```
