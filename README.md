@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a chat server that uses the [OpaquePrompts API](https://opaqueprompts.readthedocs.io/en/latest/) to demonstrate how to utilize the OpaquePrompts to build a LLM application protected by confidential computing.
+This is a chat server that uses the [OpaquePrompts API](https://opaqueprompts.readthedocs.io/en/latest/) to build a LLM application protected by confidential computing. OpaquePrompts is a privacy layer around LLMs that hides sensitive data from the model provider. You can find a deployed version of this chat server on the [OpaquePrompts website (https://opaqueprompts.opaque.co).
 
 To use OpaquePrompts, once you retrieve an API token from the [OpaquePrompts website](https://opaqueprompts.opaque.co), all you need to do is wrap the `llm` passed into `LLMChain` with `OpaquePrompts`:
 
