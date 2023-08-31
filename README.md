@@ -15,4 +15,4 @@ chain = LLMChain(
 )
 ```
 
-You can experiment with a hosted demo on the [OpaquePrompts website](https://opaqueprompts.opaque.co). Note that the source code also includes logic for authentication and for displaying intermediate (i.e., the sanitized prompt and sanitized response) steps.
+Note that the source code also includes logic for authentication and for displaying intermediate (i.e., the sanitized prompt and sanitized response) steps.
