@@ -8,12 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer
 from langchain import LLMChain, PromptTemplate
 from langchain.llms import OpenAI
-from langchain.llms.promptguard import PromptGuard
-from pgchatserver.authorization import VerifyToken
-from pgchatserver.intermediate_outputs import get_response
-from pgchatserver.memory import build_memory
-from pgchatserver.models import ChatRequest, ChatResponse
-from pgchatserver.prompt_template import PROMPT_GUARD_TEMPLATE
+from langchain.llms.opaqueprompts import OpaquePrompts
+from opchatserver.authorization import VerifyToken
+from opchatserver.intermediate_outputs import get_response
+from opchatserver.memory import build_memory
+from opchatserver.models import ChatRequest, ChatResponse
+from opchatserver.prompt_template import OPAQUEPROMPTS_TEMPLATE
 
 app = FastAPI()
 token_auth_scheme = HTTPBearer()
@@ -47,7 +47,7 @@ async def chat(
     bearer_token: Any = Depends(token_auth_scheme),
 ) -> ChatResponse:
     """
-    Secure chat endpoint that uses PromptGuard to protect the user's privacy.
+    Secure chat endpoint that uses OpaquePrompts to protect the user's privacy.
 
     Parameters
     ----------
@@ -62,7 +62,7 @@ async def chat(
     ChatResponse
         The response body, which contains the bot's response to the prompt.
         If `with_intermediate_outputs` is `True`, then the response body
-        also contains the intermediate outputs from PromptGuard and LLM.
+        also contains the intermediate outputs from OpaquePrompts and LLM.
     """
     try:
         # Verify bearer_token
@@ -82,7 +82,7 @@ async def chat(
                 status_code=400,
                 detail="history must be a list with an even number of strings",
             )
-        prompt = PromptTemplate.from_template(PROMPT_GUARD_TEMPLATE)
+        prompt = PromptTemplate.from_template(OPAQUEPROMPTS_TEMPLATE)
         memory = build_memory(chat_request.history)
 
         if chat_request.with_intermediate_outputs:
@@ -93,12 +93,12 @@ async def chat(
                 llm=OpenAI(),
             )
 
-        # This is the typical case for the PromptGuard LangChain integration.
-        # We can get security from PromptGuard by simply wrapping the LLM,
-        # e.g. `llm=OpenAI()` -> `llm=PromptGuard(base_llm=OpenAI())`.
+        # This is the typical case for the OpaquePrompts LangChain integration.
+        # We can get security from OpaquePrompts by simply wrapping the LLM,
+        # e.g. `llm=OpenAI()` -> `llm=OpaquePrompts(base_llm=OpenAI())`.
         chain = LLMChain(
             prompt=prompt,
-            llm=PromptGuard(base_llm=OpenAI()),
+            llm=OpaquePrompts(base_llm=OpenAI()),
             memory=memory,
         )
         return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))

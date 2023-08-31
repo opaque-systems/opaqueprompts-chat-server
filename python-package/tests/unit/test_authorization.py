@@ -8,17 +8,17 @@ from typing import Dict, List
 import pytest
 import requests
 from fastapi.exceptions import HTTPException
-from pgchatserver.authorization import VerifyToken
+from opchatserver.authorization import VerifyToken
 
 ### Fixtures ###
 
 
 @pytest.fixture(scope="session")
 def prompt_guard_test_secret() -> str:
-    client_secret = os.environ.get("PROMPT_GUARD_TEST_SECRET")
+    client_secret = os.environ.get("OPAQUEPROMPTS_TEST_SECRET")
     if not client_secret:
         pytest.fail(
-            "PROMPT_GUARD_TEST_SECRET environment variable must be set for"
+            "OPAQUEPROMPTS_TEST_SECRET environment variable must be set for"
             "this test"
         )
     return client_secret  # type: ignore
@@ -45,7 +45,7 @@ def auth0_access_token(prompt_guard_test_secret: str) -> str:
     if user_auth_response_payload.get("error"):
         pytest.fail(
             """
-            Failed to get auth0 access token fromPROMPT_GUARD_TEST_SECRET,
+            Failed to get auth0 access token fromOPAQUEPROMPTS_TEST_SECRET,
             please ensure the value is correct
             """
         )

@@ -38,18 +38,18 @@ jobs:
   ##################   BUILD    ###################
   #################################################
 
-  # Build and push the Promptguard chat server docker image
-  build-promptguard-chat-server:
-    name: Build Promptguard chat server
+  # Build and push the OpaquePrompts chat server docker image
+  build-opaqueprompts-chat-server:
+    name: Build OpaquePrompts chat server
     uses: ./.github/workflows/build-docker.yaml
     needs: [changes]
-    # Rebuild if the Promptguard chat server has changes or if this workflow has changed
+    # Rebuild if the OpaquePrompts chat server has changes or if this workflow has changed
     if: |
-      needs.changes.outputs.has-promptguard-chat-server-changes == 'true' ||
+      needs.changes.outputs.has-opaqueprompts-chat-server-changes == 'true' ||
       contains(needs.changes.outputs.changed-workflows, 'build-docker.yaml') ||
       contains(needs.changes.outputs.changed-workflows, 'main.yaml')
     with:
-      image-name: ghcr.io/opaque-systems/promptguard-chat-server
+      image-name: ghcr.io/opaque-systems/opaqueprompts-chat-server
       docker-context: .
       dockerfile: ./docker/Dockerfile
       base-image-version: ${{ needs.changes.outputs.fallback-image-tag }}
@@ -62,10 +62,10 @@ jobs:
   #################   PUBLISH   ###################
   #################################################
 
-  publish-promptguard-chat-server:
+  publish-opaqueprompts-chat-server:
     name: Publish chat server image
     uses: ./.github/workflows/publish-docker.yaml
-    needs: [changes, build-promptguard-chat-server]
+    needs: [changes, build-opaqueprompts-chat-server]
 
     # Run on commits to primary branches and release PRs
     # if there is a new client image or this workflow has changed
@@ -82,7 +82,7 @@ jobs:
       )
       &&
       (
-        needs.build-promptguard-chat-server.result == 'success' ||
+        needs.build-opaqueprompts-chat-server.result == 'success' ||
         contains(needs.changes.outputs.changed-workflows, 'publish-docker.yaml') ||
         contains(needs.changes.outputs.changed-workflows, 'main.yaml')
       )
@@ -92,12 +92,12 @@ jobs:
       # retagging an existing primary branch image as a release image.
       image-name: |-
         ${{
-          needs.build-promptguard-chat-server.outputs.image-name ||
-          'ghcr.io/opaque-systems/promptguard-chat-server'
+          needs.build-opaqueprompts-chat-server.outputs.image-name ||
+          'ghcr.io/opaque-systems/opaqueprompts-chat-server'
         }}
       image-version: |-
         ${{
-          needs.build-promptguard-chat-server.outputs.image-version ||
+          needs.build-opaqueprompts-chat-server.outputs.image-version ||
           needs.changes.outputs.fallback-image-tag
         }}
     secrets: inherit

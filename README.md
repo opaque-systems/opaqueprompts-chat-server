@@ -1,1 +1,1 @@
-# promptguard-chat-server
+# opaqueprompts-chat-server
