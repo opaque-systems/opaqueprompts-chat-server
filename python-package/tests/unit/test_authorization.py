@@ -45,7 +45,7 @@ def auth0_access_token(opaqueprompts_test_secret: str) -> str:
     if user_auth_response_payload.get("error"):
         pytest.fail(
             """
-            Failed to get auth0 access token fromOPAQUEPROMPTS_TEST_SECRET,
+            Failed to get auth0 access token from OPAQUEPROMPTS_TEST_SECRET,
             please ensure the value is correct
             """
         )
