@@ -6,5 +6,5 @@ python-jose==3.3.0
 requests==2.31.0
 uvicorn[standard]==0.23.2
 opaqueprompts
-langchain
+langchain@git+https://github.com/opaque-systems/langchain.git@rename_and_args#subdirectory=libs/langchain
 openai
