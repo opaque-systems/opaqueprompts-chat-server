@@ -1,7 +1,7 @@
 """
-This module handles authentication logic for the opaqueprompts chat server.
+This module handles authentication logic for the OpaquePrompts chat server.
 This logic is independent of the langchain integration, and is not needed
-for other servers using the opaqueprompts langchain integration.
+for other servers using the OpaquePrompts langchain integration.
 """
 from http import HTTPStatus
 from typing import Dict, List, Optional
