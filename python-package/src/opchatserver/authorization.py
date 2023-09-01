@@ -3,6 +3,7 @@ This module handles authentication logic for the OpaquePrompts chat server.
 This logic is independent of the langchain integration, and is not needed
 for other servers using the OpaquePrompts langchain integration.
 """
+import os
 from http import HTTPStatus
 from typing import Dict, List, Optional
 
@@ -18,8 +19,8 @@ class VerifyToken:
     https://auth0.com/blog/build-and-secure-fastapi-server-with-auth0/
     """
 
-    domain = "opaque-ppp-dev.us.auth0.com"
-    audience = "https://ppp-service.com"
+    domain = os.environ.get("AUTH0DOMAIN")
+    audience = os.environ.get("AUTH0_API_AUDIENCE")
     algorithms = ["RS256"]
 
     def __init__(self, token: str):

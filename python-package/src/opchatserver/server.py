@@ -83,7 +83,7 @@ async def chat(
     try:
         # Verify bearer_token
         VerifyToken(bearer_token.credentials).verify(
-            required_scopes=["use:opaque-ppp-chat-bot"]
+            required_scopes=["use:opaque-prompts-chat-bot"]
         )
 
         # `history` must be a list with an even number of strings,
@@ -130,6 +130,12 @@ async def chat(
     finally:
         h.observe(start - time.time())
 
+
+# Validate required env vars
+if not os.environ.get("AUTH0_DOMAIN"):
+    raise Exception("AUTH0_DOMAIN environment variable must be set")
+if not os.environ.get("AUTH0_API_AUDIENCE"):
+    raise Exception("AUTH0_API_AUDIENCE environment variable must be set")
 
 if __name__ == "__main__":
     import uvicorn
