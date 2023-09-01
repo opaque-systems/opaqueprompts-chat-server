@@ -19,7 +19,7 @@ class VerifyToken:
     https://auth0.com/blog/build-and-secure-fastapi-server-with-auth0/
     """
 
-    domain = os.environ.get("AUTH0DOMAIN")
+    domain = os.environ.get("AUTH0_DOMAIN")
     audience = os.environ.get("AUTH0_API_AUDIENCE")
     algorithms = ["RS256"]
 
