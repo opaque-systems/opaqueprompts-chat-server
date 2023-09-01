@@ -113,6 +113,12 @@ async def chat(
         )
 
 
+# Validate required env vars
+if not os.environ.get("AUTH0_DOMAIN"):
+    raise Exception("AUTH0_DOMAIN environment variable must be set")
+if not os.environ.get("AUTH0_API_AUDIENCE"):
+    raise Exception("AUTH0_API_AUDIENCE environment variable must be set")
+
 if __name__ == "__main__":
     import uvicorn
 

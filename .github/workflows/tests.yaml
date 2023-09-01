@@ -75,6 +75,8 @@ jobs:
         shell: bash
         env:
           OPAQUEPROMPTS_TEST_SECRET: '${{ secrets.AUTH0_OPAQUEPROMPTS_TEST_SECRET }}'
+          AUTH0_DOMAIN: opaque-ppp-dev.us.auth0.com
+          AUTH0_API_AUDIENCE: https://ppp-service.com
         run: |
             cd python-package/tests/
             python -m pytest unit/test_authorization.py
