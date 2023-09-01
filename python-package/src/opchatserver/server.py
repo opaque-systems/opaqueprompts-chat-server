@@ -67,7 +67,7 @@ async def chat(
     try:
         # Verify bearer_token
         VerifyToken(bearer_token.credentials).verify(
-            required_scopes=["use:opaque-ppp-chat-bot"]
+            required_scopes=["use:opaque-prompts-chat-bot"]
         )
 
         # `history` must be a list with an even number of strings,
