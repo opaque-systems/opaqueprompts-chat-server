@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from http import HTTPStatus
 from typing import Any, List
 
@@ -14,20 +15,34 @@ from opchatserver.intermediate_outputs import get_response
 from opchatserver.memory import build_memory
 from opchatserver.models import ChatRequest, ChatResponse
 from opchatserver.prompt_template import OPAQUEPROMPTS_TEMPLATE
+from prometheus_client import Histogram, make_asgi_app
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 token_auth_scheme = HTTPBearer()
-logger = logging.getLogger(__name__)
+
+# Define Prometheus histogram to track latency
+h = Histogram(
+    "http_request_duration_seconds", "Total latency of a /chat HTTP request"
+)
+
+# Add prometheus ASGI middleware to route /metrics requests
+# IMPORTANT: this is not multiprocess safe. If you wish to run
+# gunicorn with multiprocessing enabled, see instructions at
+# https://github.com/prometheus/client_python#fastapi--gunicorn
+metrics_app = make_asgi_app()
+app.mount("/metrics", metrics_app)
 
 
 def _get_origns() -> List[str]:
     """
-    Get the origins that are allowed to make requests to the chat endpoint.
+    Get the origins that are allowed to make requests to the server.
 
     Returns
     -------
     list of str
-        The origins that are allowed to make requests to the chat endpoint.
+        The origins that are allowed to make requests to the server.
     """
     return os.environ.get("ORIGINS", "http://localhost:3000").split(",")
 
@@ -64,6 +79,7 @@ async def chat(
         If `with_intermediate_outputs` is `True`, then the response body
         also contains the intermediate outputs from OpaquePrompts and LLM.
     """
+    start = time.time()
     try:
         # Verify bearer_token
         VerifyToken(bearer_token.credentials).verify(
@@ -111,6 +127,8 @@ async def chat(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=str(e),
         )
+    finally:
+        h.observe(start - time.time())
 
 
 # Validate required env vars
