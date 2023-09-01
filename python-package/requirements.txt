@@ -5,7 +5,7 @@ pyjwt==2.8.0
 python-jose==3.3.0
 requests==2.31.0
 uvicorn[standard]==0.23.2
-langchain@git+https://github.com/opaque-systems/langchain.git@rename_and_args#subdirectory=libs/langchain
-opaqueprompts
-prometheus-client
-openai
+langchain==0.0.279
+opaqueprompts==0.0.4
+prometheus-client==0.17.1
+openai==0.28.0
