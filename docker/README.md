@@ -23,7 +23,8 @@ Before running the service, you'll need to set the following environment variabl
 Then, to run the service with exposed port 8000:
 
 ```
-docker run -e OPAQUEPROMPTS_SERVER_HOSTNAME=$OPAQUEPROMPTS_SERVER_HOSTNAME -e OPAQUEPROMPTS_SERVER_PORT=$OPAQUEPROMPTS_SERVER_PORT -e OPENAI_API_KEY=$OPENAI_API_KEY -e OPAQUEPROMPTS_API_KEY=$OPAQUEPROMPTS_API_KEY -p 8000:8000 ghcr.io/opaque-systems/opaqueprompts-chat-server:dev
+docker run -e OPAQUEPROMPTS_SERVER_HOSTNAME=$OPAQUEPROMPTS_SERVER_HOSTNAME -e OPAQUEPROMPTS_SERVER_PORT=$OPAQUEPROMPTS_SERVER_PORT -e OPENAI_API_KEY=$OPENAI_API_KEY -e OPAQUEPROMPTS_API_KEY=$OPAQUEPROMPTS_API_KEY -e AUTH0_DOMAIN=$AUTH0_DOMAIN -e AUTH0_API_AUDIENCE=$AUTH0_API_AUDIENCE -p 8000:8000 ghcr.io/opaque-systems/opaqu
+eprompts-chat-server:dev
 ```
 
 Alternatively, you can set the environment variables in a file and [pass that file in with `--env-file`](https://docs.docker.com/engine/reference/commandline/run/#env).
