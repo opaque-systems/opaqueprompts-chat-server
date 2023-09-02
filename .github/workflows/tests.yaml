@@ -71,7 +71,7 @@ jobs:
       #       python -m pytest --ignore unit/test_authorization.py
 
       - name: Run authorization tests
-        if: ${{ github.event_name == 'push' }}
+        # if: ${{ github.event_name == 'push' }}
         shell: bash
         env:
           OPAQUEPROMPTS_TEST_SECRET: '${{ secrets.AUTH0_OPAQUEPROMPTS_TEST_SECRET }}'
