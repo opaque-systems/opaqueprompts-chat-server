@@ -112,6 +112,9 @@ async def chat(
         # This is the typical case for the OpaquePrompts LangChain integration.
         # We can get security from OpaquePrompts by simply wrapping the LLM,
         # e.g. `llm=OpenAI()` -> `llm=OpaquePrompts(base_llm=OpenAI())`.
+        #
+        # More about the LangChain integration can be found here:
+        # https://python.langchain.com/docs/integrations/llms/opaqueprompts
         chain = LLMChain(
             prompt=prompt,
             llm=OpaquePrompts(base_llm=OpenAI()),
