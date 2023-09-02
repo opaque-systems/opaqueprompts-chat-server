@@ -60,7 +60,7 @@ def auth0_access_token(opaqueprompts_test_secret: str) -> str:
     [
         None,
         [],
-        ["use:opaque-ppp-chat-bot"],
+        ["use:opaque-prompts-chat-bot"],
     ],
     ids=[
         "no-required-scopes",
@@ -111,7 +111,7 @@ def test_verify_invalid_token(token: str) -> None:
     "required_scopes",
     [
         ["missing-scope"],
-        ["use:opaque-ppp-chat-bot", "extra-missing-scope"],
+        ["use:opaque-prompts-chat-bot", "extra-missing-scope"],
     ],
     ids=["incorrect-scope", "mix-of-correct-and-incorrect-scopes"],
 )
