@@ -47,6 +47,18 @@ def _get_origns() -> List[str]:
     return os.environ.get("ORIGINS", "http://localhost:3000").split(",")
 
 
+def _get_openai_model() -> str:
+    """
+    Get the OpenAI model that is used by the server.
+
+    Returns
+    -------
+    str
+        The OpenAI model that is used by the server.
+    """
+    return os.environ.get("OPENAI_MODEL", "gpt-3.5-turbo")
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_get_origns(),
@@ -106,7 +118,7 @@ async def chat(
                 prompt=prompt,
                 memory=memory,
                 input=chat_request.prompt,
-                llm=OpenAI(),
+                llm=OpenAI(model_name=_get_openai_model()),
             )
 
         # This is the typical case for the OpaquePrompts LangChain integration.
@@ -117,7 +129,7 @@ async def chat(
         # https://python.langchain.com/docs/integrations/llms/opaqueprompts
         chain = LLMChain(
             prompt=prompt,
-            llm=OpaquePrompts(base_llm=OpenAI()),
+            llm=OpaquePrompts(base_llm=OpenAI(model_name=_get_openai_model())),
             memory=memory,
         )
         return ChatResponse(desanitizedResponse=chain.run(chat_request.prompt))
