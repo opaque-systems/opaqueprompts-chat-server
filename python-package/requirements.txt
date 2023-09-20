@@ -6,6 +6,6 @@ python-jose==3.3.0
 requests==2.31.0
 uvicorn[standard]==0.23.2
 langchain==0.0.279
-opaqueprompts==0.0.6
+opaqueprompts>=0.1.0
 prometheus-client==0.17.1
 openai==0.28.0
